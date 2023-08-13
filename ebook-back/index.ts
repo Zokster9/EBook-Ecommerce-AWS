@@ -1,13 +1,30 @@
+import bodyParser from "body-parser";
+import cors from "cors";
 import express from "express";
+import session from "express-session";
+import morgan from "morgan";
+import passport from "passport";
+import { api } from "./api/api";
 
-const port = 8000;
+const PORT = process.env.PORT || 8000;
 
 const app = express();
 
-app.get("/", (req, res) => {
-  res.send("Init");
-});
+app.use(
+  session({
+    secret: "keyboard dog",
+    resave: true,
+    saveUninitialized: true,
+  })
+);
+app.use(cors());
+app.use(bodyParser.json());
+app.use(morgan("dev"));
+app.use(passport.initialize());
+app.use(passport.session());
 
-app.listen(port, () => {
-  console.log(`Listening  on port ${port}`);
+app.use("/api", api);
+
+app.listen(PORT, () => {
+  console.log(`Listening  on port ${PORT}`);
 });
