@@ -1,6 +1,7 @@
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
+import { NavLink } from "react-router-dom";
 import logo from "../../assets/ebook.svg";
 
 const Header = () => {
@@ -12,7 +13,7 @@ const Header = () => {
       className="shadow-sm mb-4"
     >
       <Container>
-        <Navbar.Brand href="#home">
+        <Navbar.Brand to="/" as={NavLink}>
           <img
             src={logo}
             width="130"
@@ -34,10 +35,14 @@ const Header = () => {
             <Button variant="outline-success">Search</Button>
           </Form> */}
           <Nav className="ms-auto">
-            <Nav.Link href="#home">Sign in</Nav.Link>
+            <Nav.Link to="login" as={NavLink}>
+              Sign in
+            </Nav.Link>
           </Nav>
           <Nav>
-            <Nav.Link href="#home">Register</Nav.Link>
+            <Nav.Link to="register" as={NavLink}>
+              Register
+            </Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Container>

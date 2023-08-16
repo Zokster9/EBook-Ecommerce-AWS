@@ -51,10 +51,7 @@ authRouter.post("/login", (req, res, next) => {
     { session: false },
     (err: any, user: User, info: string) => {
       if (err || !user) {
-        return res.status(400).json({
-          message: info,
-          user: user,
-        });
+        return res.status(400).send(info);
       } else {
         req.login(user, { session: false }, (err: any) => {
           if (err) {
@@ -66,7 +63,7 @@ authRouter.post("/login", (req, res, next) => {
               lastName: user.lastName,
             };
             const token = jwt.sign(userDTO, process.env.JWTSECRET!);
-            return res.status(200).json({ userDTO, token });
+            return res.status(200).json({ token: token });
           }
         });
       }
