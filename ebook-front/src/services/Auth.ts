@@ -1,5 +1,6 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import jwtDecode from "jwt-decode";
+import { UserCreationDTO } from "../model/user-creation-dto";
 import { UserDTO } from "../model/user-dto";
 import { baseUrl } from "./AxiosConfiguration";
 
@@ -23,4 +24,10 @@ export const login = async (
         reject(err);
       });
     });
+};
+
+export const register = async (
+  userCreationDTO: UserCreationDTO
+): Promise<AxiosResponse<string>> => {
+  return axios.post<string>(baseUrl + "api/auth/register", userCreationDTO);
 };
