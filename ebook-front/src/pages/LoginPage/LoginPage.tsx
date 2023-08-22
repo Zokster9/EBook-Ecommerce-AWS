@@ -4,6 +4,7 @@ import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Form from "react-bootstrap/Form";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as yup from "yup";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
@@ -14,6 +15,7 @@ import { passwordRegex } from "../../utils/utils";
 const LoginPage = () => {
   const { Formik } = formik;
   const [, setUser] = useLocalStorage<UserDTO | null>("user", null);
+  const navigate = useNavigate();
 
   const schema = yup.object().shape({
     email: yup.string().email().required(),
@@ -35,6 +37,7 @@ const LoginPage = () => {
         setUser(user);
         toast.success("You have successfully logged in");
         actions.setSubmitting(false);
+        navigate("/home");
       })
       .catch((err: AxiosError<{ message: string }>) => {
         console.error(err);
