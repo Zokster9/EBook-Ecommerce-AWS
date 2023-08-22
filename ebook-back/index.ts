@@ -17,7 +17,20 @@ app.use(
     saveUninitialized: true,
   })
 );
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "OPTIONS", "DELETE", "PUT", "PATCH"],
+    allowedHeaders: [
+      "X-Requested-With",
+      "Origin",
+      "Content-Type",
+      "Accept",
+      "Authorization",
+    ],
+    credentials: true,
+  })
+);
 app.use(bodyParser.json());
 app.use(morgan("dev"));
 app.use(passport.initialize());
