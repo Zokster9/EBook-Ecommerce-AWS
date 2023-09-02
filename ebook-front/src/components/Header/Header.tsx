@@ -1,10 +1,14 @@
+import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { NavLink } from "react-router-dom";
 import logo from "../../assets/ebook.svg";
+import { useShoppingCart } from "../../context/ShoppingCartContext";
+import CartIcon from "../CartIcon/CartIcon";
 
 const Header = () => {
+  const { openCart, cartQuantity } = useShoppingCart();
   return (
     <Navbar
       sticky="top"
@@ -13,7 +17,7 @@ const Header = () => {
       className="shadow-sm mb-4"
     >
       <Container>
-        <Navbar.Brand to="/" as={NavLink}>
+        <Navbar.Brand to="/home" as={NavLink}>
           <img
             src={logo}
             width="130"
@@ -44,6 +48,16 @@ const Header = () => {
               Register
             </Nav.Link>
           </Nav>
+          {cartQuantity > 0 && (
+            <Button
+              onClick={openCart}
+              style={{ width: "3rem", height: "3rem", position: "relative" }}
+              variant="outline-primary"
+              className="rounded-circle"
+            >
+              <CartIcon quantity={cartQuantity} />
+            </Button>
+          )}
         </Navbar.Collapse>
       </Container>
     </Navbar>

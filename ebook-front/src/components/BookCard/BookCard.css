@@ -1,6 +1,19 @@
 .text-truncate-container {
-  -webkit-line-clamp: 5;
+  -webkit-line-clamp: 3;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.book-card {
+  box-shadow: 5px 0 10px 2px #666;
+  transition: box-shadow 0.2s ease-in-out, opacity 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.book-card:hover,
+.book-card:active {
+  opacity: 0.8;
+  box-shadow: 0 0 5px 10px #666;
+  transition: box-shadow 0.2s ease-in-out, opacity 0.2s ease-in-out;
 }

@@ -1,6 +1,6 @@
 import { BookDb } from "./book-db";
 
-export interface BookDbPaginated {
+export interface BooksDbPaginated {
   totalcount: number;
   books: BookDb[];
 }

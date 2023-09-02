@@ -1,8 +1,9 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
+import { BookDTO } from "../model/book-dto";
 import { BooksDTO } from "../model/books-dto";
 import { baseUrl } from "./AxiosConfiguration";
 
-export const getBooks = async ({
+export const getBooks = ({
   pageNumber,
   pageLength,
 }: {
@@ -15,4 +16,10 @@ export const getBooks = async ({
       limit: pageLength,
     },
   });
+};
+
+export const getBookById = (
+  bookId: number
+): Promise<AxiosResponse<BookDTO, any>> => {
+  return axios.get<BookDTO>(`${baseUrl}api/books/${bookId}`);
 };
