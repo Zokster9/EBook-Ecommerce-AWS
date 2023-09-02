@@ -1,11 +1,14 @@
+import { AxiosError } from "axios";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { NavLink } from "react-router-dom";
+import { toast } from "react-toastify";
 import logo from "../../assets/ebook.svg";
 import { useShoppingCart } from "../../context/ShoppingCartContext";
 import { useUser } from "../../context/UserContext";
+import { logout } from "../../services/Auth";
 import CartIcon from "../CartIcon/CartIcon";
 
 const Header = () => {
@@ -14,9 +17,16 @@ const Header = () => {
 
   const user = getUser();
 
-  const logout = () => {
-    logoutUser();
-    localStorage.removeItem("token");
+  const logOut = () => {
+    logout()
+      .then((_) => {
+        logoutUser();
+        localStorage.removeItem("token");
+        toast.success("Successfully logged out");
+      })
+      .catch((err: AxiosError<{ message: string }>) => {
+        toast.error(err.response?.data.message);
+      });
   };
   return (
     <Navbar
@@ -30,7 +40,7 @@ const Header = () => {
           <img
             src={logo}
             width="130"
-            height="35"
+            height="40"
             style={{ objectFit: "cover" }}
             className="d-inline-block align-top"
             alt="EBook logo"
@@ -61,7 +71,7 @@ const Header = () => {
               </Nav>
             </>
           ) : (
-            <>
+            <div className="d-flex justify-content-around align-items-center ms-auto gap-2">
               {cartQuantity > 0 && (
                 <Button
                   onClick={openCart}
@@ -76,12 +86,12 @@ const Header = () => {
                   <CartIcon quantity={cartQuantity} />
                 </Button>
               )}
-              <Nav className="ms-auto" onClick={logout}>
+              <Nav onClick={logOut}>
                 <Nav.Link to="login" as={NavLink}>
                   Logout
                 </Nav.Link>
               </Nav>
-            </>
+            </div>
           )}
         </Navbar.Collapse>
       </Container>

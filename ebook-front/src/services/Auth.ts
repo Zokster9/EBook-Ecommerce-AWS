@@ -31,3 +31,5 @@ export const register = async (
 ): Promise<AxiosResponse<string>> => {
   return axios.post<string>(baseUrl + "api/auth/register", userCreationDTO);
 };
+
+export const logout = () => axios.post(baseUrl + "api/auth/logout");

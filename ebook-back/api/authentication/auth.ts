@@ -70,3 +70,12 @@ authRouter.post("/login", (req, res, next) => {
     }
   )(req, res, next);
 });
+
+authRouter.post("/logout", (req, res, next) => {
+  req.logout(function (err) {
+    if (err) {
+      return next(err);
+    }
+    res.sendStatus(200);
+  });
+});

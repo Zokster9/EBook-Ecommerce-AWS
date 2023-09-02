@@ -7,6 +7,7 @@ import Container from "react-bootstrap/Container";
 import ListGroup from "react-bootstrap/ListGroup";
 import defaultCover from "../../assets/default_book_cover.png";
 import { useShoppingCart } from "../../context/ShoppingCartContext";
+import { useUser } from "../../context/UserContext";
 import { BookDTO } from "../../model/book-dto";
 import { convertDateToString } from "../../utils/utils";
 import "./BookCard.css";
@@ -23,6 +24,8 @@ const BookCard = ({ book }: BookProps) => {
     removeFromCart,
   } = useShoppingCart();
   const quantity = getItemQuantity(book.id);
+  const { getUser } = useUser();
+  const user = getUser();
   return (
     <Card
       bg="light"
@@ -72,67 +75,71 @@ const BookCard = ({ book }: BookProps) => {
           </ListGroup.Item>
         </ListGroup>
         <Card.Text className="fw-bold">Price: {book.price}$</Card.Text>
-        <Container className="d-flex w-100 align-items-center justify-content-around mb-2">
-          <Button className="w-100" variant="dark">
-            <span className="me-2">
-              <FavoriteBorderIcon />
-            </span>
-            Add to wishlist
-          </Button>
-        </Container>
-        <Container className="d-flex w-100 align-items-center justify-content-around">
-          {quantity === 0 ? (
-            <Button
-              className="w-100"
-              onClick={(e: MouseEvent) => {
-                e.stopPropagation();
-                return increaseCartQuantity(book.id);
-              }}
-            >
-              <AddShoppingCartIcon /> Add To Cart
-            </Button>
-          ) : (
-            <div
-              className="d-flex align-items-center flex-column"
-              style={{ gap: ".5rem" }}
-            >
-              <div
-                className="d-flex align-items-center justify-content-center"
-                style={{ gap: ".5rem" }}
-              >
+        {user.id && (
+          <>
+            <Container className="d-flex w-100 align-items-center justify-content-around mb-2">
+              <Button className="w-100" variant="dark">
+                <span className="me-2">
+                  <FavoriteBorderIcon />
+                </span>
+                Add to wishlist
+              </Button>
+            </Container>
+            <Container className="d-flex w-100 align-items-center justify-content-around">
+              {quantity === 0 ? (
                 <Button
-                  onClick={(e: MouseEvent) => {
-                    e.stopPropagation();
-                    return decreaseCartQuantity(book.id);
-                  }}
-                >
-                  -
-                </Button>
-                <div>
-                  <span className="fs-3">{quantity}</span> in cart
-                </div>
-                <Button
+                  className="w-100"
                   onClick={(e: MouseEvent) => {
                     e.stopPropagation();
                     return increaseCartQuantity(book.id);
                   }}
                 >
-                  +
+                  <AddShoppingCartIcon /> Add To Cart
                 </Button>
-                <Button
-                  onClick={(e: MouseEvent) => {
-                    e.stopPropagation();
-                    return removeFromCart(book.id);
-                  }}
-                  variant="danger"
-                  size="sm"
+              ) : (
+                <div
+                  className="d-flex align-items-center flex-column"
+                  style={{ gap: ".5rem" }}
                 >
-                  Remove
-                </Button>
-              </div>
-            </div>
-          )}
-        </Container>
+                  <div
+                    className="d-flex align-items-center justify-content-center"
+                    style={{ gap: ".5rem" }}
+                  >
+                    <Button
+                      onClick={(e: MouseEvent) => {
+                        e.stopPropagation();
+                        return decreaseCartQuantity(book.id);
+                      }}
+                    >
+                      -
+                    </Button>
+                    <div>
+                      <span className="fs-3">{quantity}</span> in cart
+                    </div>
+                    <Button
+                      onClick={(e: MouseEvent) => {
+                        e.stopPropagation();
+                        return increaseCartQuantity(book.id);
+                      }}
+                    >
+                      +
+                    </Button>
+                    <Button
+                      onClick={(e: MouseEvent) => {
+                        e.stopPropagation();
+                        return removeFromCart(book.id);
+                      }}
+                      variant="danger"
+                      size="sm"
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </Container>
+          </>
+        )}
       </Card.Body>
     </Card>
   );
