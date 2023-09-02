@@ -5,10 +5,19 @@ import Navbar from "react-bootstrap/Navbar";
 import { NavLink } from "react-router-dom";
 import logo from "../../assets/ebook.svg";
 import { useShoppingCart } from "../../context/ShoppingCartContext";
+import { useUser } from "../../context/UserContext";
 import CartIcon from "../CartIcon/CartIcon";
 
 const Header = () => {
   const { openCart, cartQuantity } = useShoppingCart();
+  const { getUser, logoutUser } = useUser();
+
+  const user = getUser();
+
+  const logout = () => {
+    logoutUser();
+    localStorage.removeItem("token");
+  };
   return (
     <Navbar
       sticky="top"
@@ -38,25 +47,41 @@ const Header = () => {
             />
             <Button variant="outline-success">Search</Button>
           </Form> */}
-          <Nav className="ms-auto">
-            <Nav.Link to="login" as={NavLink}>
-              Sign in
-            </Nav.Link>
-          </Nav>
-          <Nav>
-            <Nav.Link to="register" as={NavLink}>
-              Register
-            </Nav.Link>
-          </Nav>
-          {cartQuantity > 0 && (
-            <Button
-              onClick={openCart}
-              style={{ width: "3rem", height: "3rem", position: "relative" }}
-              variant="outline-primary"
-              className="rounded-circle"
-            >
-              <CartIcon quantity={cartQuantity} />
-            </Button>
+          {!user.id ? (
+            <>
+              <Nav className="ms-auto">
+                <Nav.Link to="login" as={NavLink}>
+                  Sign in
+                </Nav.Link>
+              </Nav>
+              <Nav>
+                <Nav.Link to="register" as={NavLink}>
+                  Register
+                </Nav.Link>
+              </Nav>
+            </>
+          ) : (
+            <>
+              {cartQuantity > 0 && (
+                <Button
+                  onClick={openCart}
+                  style={{
+                    width: "3rem",
+                    height: "3rem",
+                    position: "relative",
+                  }}
+                  variant="outline-primary"
+                  className="rounded-circle"
+                >
+                  <CartIcon quantity={cartQuantity} />
+                </Button>
+              )}
+              <Nav className="ms-auto" onClick={logout}>
+                <Nav.Link to="login" as={NavLink}>
+                  Logout
+                </Nav.Link>
+              </Nav>
+            </>
           )}
         </Navbar.Collapse>
       </Container>

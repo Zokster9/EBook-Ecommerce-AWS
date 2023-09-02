@@ -1,16 +1,19 @@
 import { BrowserRouter } from "react-router-dom";
 import { ShoppingCartProvider } from "../../context/ShoppingCartContext";
+import { UserProvider } from "../../context/UserContext";
 import AppRouter from "../AppRouter/AppRouter";
 import Header from "../Header/Header";
 
 const Layout = () => {
   return (
-    <ShoppingCartProvider>
-      <BrowserRouter>
-        <Header />
-        <AppRouter />
-      </BrowserRouter>
-    </ShoppingCartProvider>
+    <UserProvider>
+      <ShoppingCartProvider>
+        <BrowserRouter>
+          <Header />
+          <AppRouter />
+        </BrowserRouter>
+      </ShoppingCartProvider>
+    </UserProvider>
   );
 };
 

@@ -7,14 +7,13 @@ import Form from "react-bootstrap/Form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as yup from "yup";
-import { useLocalStorage } from "../../hooks/useLocalStorage";
-import { UserDTO } from "../../model/user-dto";
+import { useUser } from "../../context/UserContext";
 import { login } from "../../services/Auth";
 import { passwordRegex } from "../../utils/utils";
 
 const LoginPage = () => {
   const { Formik } = formik;
-  const [, setUser] = useLocalStorage<UserDTO | null>("user", null);
+  const { loginUser } = useUser();
   const navigate = useNavigate();
 
   const schema = yup.object().shape({
@@ -33,8 +32,8 @@ const LoginPage = () => {
     actions: any
   ) => {
     login(values.email, values.password)
-      .then((user) => {
-        setUser(user);
+      .then((userDTO) => {
+        loginUser(userDTO);
         toast.success("You have successfully logged in");
         actions.setSubmitting(false);
         navigate("/home");
