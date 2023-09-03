@@ -21,7 +21,6 @@ export class UserRepo implements IUserRepo {
             if (err || !results.rowCount) {
               resolve(null);
             } else {
-              console.log(results.rows[0]);
               const dbUser = results.rows[0];
               const user = new User(
                 dbUser.user_id,

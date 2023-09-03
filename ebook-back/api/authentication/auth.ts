@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { UserRepo } from "../../db/user-model";
 import { User } from "../../model/user";
@@ -12,6 +12,20 @@ import passport from "./passport";
 dotenv.config();
 
 export const authRouter = express.Router();
+
+const isAdminAuthenticated =
+  (passport.authenticate("jwt", { session: false }),
+  (
+    req: Request<{}, {}, { user: UserDTO }>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    req.body.user = req.user as UserDTO;
+    if (req.body.user.role === "ROLE_ADMIN") {
+      return next();
+    }
+    res.status(401).send("Unauthorized!");
+  });
 
 authRouter.post(
   "/register",
@@ -63,7 +77,12 @@ authRouter.post("/login", (req, res, next) => {
               lastName: user.lastName,
             };
             const token = jwt.sign(userDTO, process.env.JWTSECRET!);
-            return res.status(200).json({ token: token });
+            return res
+              .status(200)
+              .cookie("jwt", token, {
+                httpOnly: true,
+              })
+              .json({ token: token });
           }
         });
       }
@@ -71,11 +90,15 @@ authRouter.post("/login", (req, res, next) => {
   )(req, res, next);
 });
 
-authRouter.post("/logout", (req, res, next) => {
-  req.logout(function (err) {
-    if (err) {
-      return next(err);
-    }
-    res.sendStatus(200);
-  });
-});
+authRouter.post(
+  "/logout",
+  passport.authenticate("jwt", { session: false }),
+  (req, res, next) => {
+    req.logout(function (err) {
+      if (err) {
+        return next(err);
+      }
+      res.sendStatus(200);
+    });
+  }
+);

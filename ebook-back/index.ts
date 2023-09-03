@@ -1,5 +1,6 @@
 import bodyParser from "body-parser";
 import cors from "cors";
+import dotenv from "dotenv";
 import express from "express";
 import session from "express-session";
 import morgan from "morgan";
@@ -8,13 +9,16 @@ import { api } from "./api/api";
 
 const PORT = process.env.PORT || 8000;
 
+dotenv.config();
+
 const app = express();
 
 app.use(
   session({
-    secret: "keyboard dog",
+    secret: process.env.JWTSECRET!,
     resave: true,
     saveUninitialized: true,
+    cookie: { secure: false },
   })
 );
 app.use(
@@ -27,6 +31,7 @@ app.use(
       "Content-Type",
       "Accept",
       "Authorization",
+      "Access-Control-Allow-Credentials",
     ],
     credentials: true,
   })
