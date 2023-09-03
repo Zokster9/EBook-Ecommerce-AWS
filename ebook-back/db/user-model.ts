@@ -12,40 +12,31 @@ export class UserRepo implements IUserRepo {
   findByEmail(email: string): Promise<User | null> {
     return new Promise((resolve, reject) => {
       pool.query<UserDB>(
-        "SELECT * FROM users WHERE email = $1",
+        `WITH user_rented_books AS (SELECT u.*, COALESCE(json_agg(rb.*) FILTER (WHERE rb.book_id IS NOT NULL), '[]') as rentedBooks FROM users u LEFT JOIN rented_books rb ON u.user_id = rb.user_id WHERE u.email = $1 GROUP BY u.user_id),
+        user_owned_books AS (SELECT u.user_id, COALESCE(json_agg(ob.*) FILTER (WHERE ob.book_id IS NOT NULL), '[]') as ownedBooks FROM users u LEFT JOIN owned_books ob ON u.user_id = ob.user_id WHERE u.email = $1 GROUP BY u.user_id)
+        SELECT urb.*, uob.ownedbooks, r.role_name FROM user_owned_books uob INNER JOIN user_rented_books urb ON uob.user_id = urb.user_id INNER JOIN roles r ON urb.role_id = r.role_id;`,
         [email],
         (err, results) => {
           try {
             if (err || !results.rowCount) {
               resolve(null);
             } else {
+              console.log(results.rows[0]);
               const dbUser = results.rows[0];
-              pool.query<{ role_name: string }>(
-                "SELECT role_name FROM roles WHERE role_id = $1",
-                [dbUser.role_id],
-                (err, results) => {
-                  try {
-                    if (err || !results.rowCount) {
-                      resolve(null);
-                    } else {
-                      const user = new User(
-                        dbUser.user_id,
-                        dbUser.email,
-                        dbUser.user_password,
-                        dbUser.user_name,
-                        dbUser.coins,
-                        dbUser.first_name,
-                        dbUser.last_name,
-                        results.rows[0].role_name,
-                        dbUser.avatar
-                      );
-                      resolve(user);
-                    }
-                  } catch (error) {
-                    reject("Something went wrong!");
-                  }
-                }
+              const user = new User(
+                dbUser.user_id,
+                dbUser.email,
+                dbUser.user_password,
+                dbUser.user_name,
+                dbUser.coins,
+                dbUser.first_name,
+                dbUser.last_name,
+                dbUser.role_name,
+                dbUser.rentedbooks,
+                dbUser.ownedbooks,
+                dbUser.avatar
               );
+              resolve(user);
             }
           } catch (error) {
             reject("Something went wrong!");

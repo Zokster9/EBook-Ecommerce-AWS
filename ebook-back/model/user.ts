@@ -1,3 +1,8 @@
+import { OwnedBook } from "./ownedBook";
+import { OwnedBookDB } from "./ownedBook-db";
+import { RentedBook } from "./rentedBook";
+import { RentedBookDB } from "./rentedBook-db";
+
 export class User {
   id: number;
   email: string;
@@ -7,6 +12,8 @@ export class User {
   avatar?: string;
   name: { firstName: string; lastName: string };
   role: string;
+  rentedBooks: RentedBook[];
+  ownedBooks: OwnedBook[];
 
   constructor(
     id: number,
@@ -17,6 +24,8 @@ export class User {
     firstName: string,
     lastName: string,
     role: string,
+    rentedBooks: RentedBookDB[],
+    ownedBooks: OwnedBookDB[],
     avatar?: string
   ) {
     this.id = id;
@@ -27,6 +36,15 @@ export class User {
     this.avatar = avatar;
     this.name = { firstName, lastName };
     this.role = role;
+    this.rentedBooks = rentedBooks.map<RentedBook>((rentedBook) => ({
+      bookId: rentedBook.book_id,
+      rentDate: rentedBook.rent_date,
+      isReturned: rentedBook.is_returned,
+    }));
+    this.ownedBooks = ownedBooks.map<OwnedBook>((ownedBook) => ({
+      bookId: ownedBook.book_id,
+      buyDate: ownedBook.buy_date,
+    }));
   }
 
   get firstName(): string {
