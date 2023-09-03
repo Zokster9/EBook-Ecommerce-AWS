@@ -1,3 +1,5 @@
+import { RentedBookDB } from "../model/rentedBook-db";
+import { RentedBookDTO } from "../model/rentedBook-dto";
 import { User } from "../model/user";
 import { UserCreation } from "../model/user-creation";
 import { UserDB } from "../model/user-db";
@@ -60,6 +62,53 @@ export class UserRepo implements IUserRepo {
           user.username,
           user.coins,
         ],
+        (err, results) => {
+          try {
+            if (err || !results.rowCount) {
+              resolve(false);
+            } else {
+              console.log(results.rows);
+              resolve(true);
+            }
+          } catch (error) {
+            reject("Something went wrong!");
+          }
+        }
+      );
+    });
+  }
+
+  rentBook(userId: string, rentBookDTO: RentedBookDTO): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      pool.query<RentedBookDB>(
+        `INSERT INTO rented_books (user_id, book_id, rent_date, is_returned) VALUES ($1, $2, $3, $4) RETURNING *`,
+        [
+          userId,
+          rentBookDTO.bookId,
+          rentBookDTO.rentDate,
+          rentBookDTO.isReturned,
+        ],
+        (err, results) => {
+          try {
+            if (err || !results.rowCount) {
+              resolve(false);
+            } else {
+              console.log(results.rows);
+              resolve(true);
+            }
+          } catch (error) {
+            reject("Something went wrong!");
+          }
+        }
+      );
+    });
+  }
+
+  returnBook(userId: string, rentBookDTO: RentedBookDTO): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      pool.query<RentedBookDB>(
+        `UPDATE rented_books SET is_returned = TRUE WHERE user_id = $1 AND book_id = $2 AND rent_date = $3 RETURNING *`,
+        [userId, rentBookDTO.bookId, rentBookDTO.rentDate],
         (err, results) => {
           try {
             if (err || !results.rowCount) {

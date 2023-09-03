@@ -1,14 +1,19 @@
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import { MouseEvent } from "react";
+import HandshakeIcon from "@mui/icons-material/Handshake";
+import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
+import { AxiosError } from "axios";
+import { MouseEvent, useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
 import ListGroup from "react-bootstrap/ListGroup";
+import { toast } from "react-toastify";
 import defaultCover from "../../assets/default_book_cover.png";
 import { useShoppingCart } from "../../context/ShoppingCartContext";
 import { useUser } from "../../context/UserContext";
 import { BookDTO } from "../../model/book-dto";
+import { rentBook, returnBook } from "../../services/UserService";
 import { convertDateToString } from "../../utils/utils";
 import "./BookCard.css";
 
@@ -24,8 +29,54 @@ const BookCard = ({ book }: BookProps) => {
     removeFromCart,
   } = useShoppingCart();
   const quantity = getItemQuantity(book.id);
-  const { getUser } = useUser();
-  const user = getUser();
+  const { user, updateUser } = useUser();
+  const [isBookRented, setIsBookRented] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (user.rentedBooks) {
+      setIsBookRented(
+        user.rentedBooks.some(
+          (rentedBook) =>
+            rentedBook.bookId === book.id && !rentedBook.isReturned
+        )
+      );
+    }
+  }, [user, book.id]);
+
+  const onRentBookClick = (e: MouseEvent) => {
+    e.stopPropagation();
+    const rentedBookDTO = {
+      bookId: book.id,
+      rentDate: new Date(),
+      isReturned: false,
+    };
+    rentBook(user.id!, rentedBookDTO)
+      .then((response) => {
+        user.rentedBooks = [...user.rentedBooks!, rentedBookDTO];
+        updateUser(user);
+        toast.success(response.data);
+      })
+      .catch((err: AxiosError<{ message: string }>) => {
+        toast.error(err.response?.data.message);
+      });
+  };
+
+  const onReturnBookClick = (e: MouseEvent) => {
+    e.stopPropagation();
+    const returnedBook = user.rentedBooks!.filter(
+      (rentedBook) => rentedBook.bookId === book.id && !rentedBook.isReturned
+    )[0];
+    returnBook(user.id!, returnedBook)
+      .then((response) => {
+        returnedBook.isReturned = true;
+        updateUser(user);
+        toast.success(response.data);
+      })
+      .catch((err: AxiosError<{ message: string }>) => {
+        toast.error(err.response?.data.message);
+      });
+  };
+
   return (
     <Card
       bg="light"
@@ -37,7 +88,7 @@ const BookCard = ({ book }: BookProps) => {
       <Card.Img
         variant="top"
         className="object-fit-cover"
-        height={400}
+        height={350}
         width={300}
         src={book.cover ? book.cover : defaultCover}
       />
@@ -77,13 +128,42 @@ const BookCard = ({ book }: BookProps) => {
         <Card.Text className="fw-bold">Price: {book.price}$</Card.Text>
         {user.id && (
           <>
-            <Container className="d-flex w-100 align-items-center justify-content-around mb-2">
-              <Button className="w-100" variant="dark">
+            <Container className="d-flex w-100 align-items-center justify-content-around mb-2 gap-2">
+              <Button style={{ height: 60 }} className="w-50" variant="dark">
                 <span className="me-2">
                   <FavoriteBorderIcon />
                 </span>
                 Add to wishlist
               </Button>
+              {isBookRented ? (
+                <>
+                  <Button
+                    style={{ height: 60 }}
+                    className="w-50"
+                    variant="dark"
+                    onClick={onReturnBookClick}
+                  >
+                    <span className="me-2">
+                      <KeyboardReturnIcon />
+                    </span>
+                    Return the book
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    style={{ height: 60 }}
+                    className="w-50"
+                    variant="dark"
+                    onClick={onRentBookClick}
+                  >
+                    <span className="me-2">
+                      <HandshakeIcon />
+                    </span>
+                    Rent the book
+                  </Button>
+                </>
+              )}
             </Container>
             <Container className="d-flex w-100 align-items-center justify-content-around">
               {quantity === 0 ? (

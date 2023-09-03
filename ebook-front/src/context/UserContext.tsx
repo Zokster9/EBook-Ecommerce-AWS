@@ -16,10 +16,6 @@ export const useUser = () => {
 export const UserProvider = ({ children }: UserProviderProps) => {
   const [user, setUser] = useLocalStorage<Partial<UserDTO>>("user", {});
 
-  const getUser = (): Partial<UserDTO> => {
-    return user;
-  };
-
   const loginUser = (newUser: UserDTO): void => {
     setUser(newUser);
   };
@@ -28,12 +24,17 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     setUser({});
   };
 
+  const updateUser = (updatedUser: Partial<UserDTO>): void => {
+    setUser((prevUser) => ({ ...prevUser, ...updatedUser }));
+  };
+
   return (
     <UserContext.Provider
       value={{
-        getUser,
+        user,
         loginUser,
         logoutUser,
+        updateUser,
       }}
     >
       {children}

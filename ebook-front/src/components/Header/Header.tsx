@@ -13,9 +13,7 @@ import CartIcon from "../CartIcon/CartIcon";
 
 const Header = () => {
   const { openCart, cartQuantity } = useShoppingCart();
-  const { getUser, logoutUser } = useUser();
-
-  const user = getUser();
+  const { user, logoutUser } = useUser();
 
   const logOut = () => {
     logout()
