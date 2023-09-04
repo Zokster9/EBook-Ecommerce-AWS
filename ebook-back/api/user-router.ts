@@ -53,3 +53,51 @@ userRouter.put(
       });
   }
 );
+
+userRouter.post(
+  "/:userId/wishlist/:bookId",
+  passport.authenticate("jwt", { session: false }),
+  (req: Request<{ userId: string; bookId: string }>, res: Response) => {
+    const userRepo = new UserRepo();
+    const userId = req.params.userId;
+    const bookId = req.params.bookId;
+    userRepo
+      .addToWishlist(userId, bookId)
+      .then((isSuccessful) => {
+        if (isSuccessful) {
+          return res.status(201).send("Book successfully wishlisted");
+        } else {
+          return res.status(500).send("Book could not be wishlisted");
+        }
+      })
+      .catch((err) => {
+        return res.status(500).send(err);
+      });
+  }
+);
+
+userRouter.delete(
+  "/:userId/wishlist/:bookId",
+  passport.authenticate("jwt", { session: false }),
+  (req: Request<{ userId: string; bookId: string }>, res: Response) => {
+    const userRepo = new UserRepo();
+    const userId = req.params.userId;
+    const bookId = req.params.bookId;
+    userRepo
+      .removeFromWishlist(userId, bookId)
+      .then((isSuccessful) => {
+        if (isSuccessful) {
+          return res
+            .status(204)
+            .send("Book successfully removed from wishlist");
+        } else {
+          return res
+            .status(500)
+            .send("Book could not be removed from wishlist");
+        }
+      })
+      .catch((err) => {
+        return res.status(500).send(err);
+      });
+  }
+);

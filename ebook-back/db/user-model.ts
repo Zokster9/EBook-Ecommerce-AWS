@@ -15,8 +15,10 @@ export class UserRepo implements IUserRepo {
     return new Promise((resolve, reject) => {
       pool.query<UserDB>(
         `WITH user_rented_books AS (SELECT u.*, COALESCE(json_agg(rb.*) FILTER (WHERE rb.book_id IS NOT NULL), '[]') as rentedBooks FROM users u LEFT JOIN rented_books rb ON u.user_id = rb.user_id WHERE u.email = $1 GROUP BY u.user_id),
-        user_owned_books AS (SELECT u.user_id, COALESCE(json_agg(ob.*) FILTER (WHERE ob.book_id IS NOT NULL), '[]') as ownedBooks FROM users u LEFT JOIN owned_books ob ON u.user_id = ob.user_id WHERE u.email = $1 GROUP BY u.user_id)
-        SELECT urb.*, uob.ownedbooks, r.role_name FROM user_owned_books uob INNER JOIN user_rented_books urb ON uob.user_id = urb.user_id INNER JOIN roles r ON urb.role_id = r.role_id;`,
+user_owned_books AS (SELECT u.user_id, COALESCE(json_agg(ob.*) FILTER (WHERE ob.book_id IS NOT NULL), '[]') as ownedBooks FROM users u LEFT JOIN owned_books ob ON u.user_id = ob.user_id WHERE u.email = $1 GROUP BY u.user_id),
+user_wishlist_books AS (SELECT u.user_id, COALESCE(json_agg(w.book_id) FILTER (WHERE w.book_id IS NOT NULL), '[]') as wishlistbooks FROM users u LEFT JOIN wishlists w ON u.user_id = w.user_id WHERE u.email = $1 GROUP BY u.user_id)
+
+SELECT urb.*, uob.ownedbooks, uwb.wishlistbooks, r.role_name FROM user_owned_books uob INNER JOIN user_wishlist_books uwb ON uob.user_id = uwb.user_id INNER JOIN user_rented_books urb ON uwb.user_id = urb.user_id INNER JOIN roles r ON urb.role_id = r.role_id;`,
         [email],
         (err, results) => {
           try {
@@ -35,6 +37,7 @@ export class UserRepo implements IUserRepo {
                 dbUser.role_name,
                 dbUser.rentedbooks,
                 dbUser.ownedbooks,
+                dbUser.wishlistbooks,
                 dbUser.avatar
               );
               resolve(user);
@@ -67,7 +70,6 @@ export class UserRepo implements IUserRepo {
             if (err || !results.rowCount) {
               resolve(false);
             } else {
-              console.log(results.rows);
               resolve(true);
             }
           } catch (error) {
@@ -93,7 +95,6 @@ export class UserRepo implements IUserRepo {
             if (err || !results.rowCount) {
               resolve(false);
             } else {
-              console.log(results.rows);
               resolve(true);
             }
           } catch (error) {
@@ -114,7 +115,46 @@ export class UserRepo implements IUserRepo {
             if (err || !results.rowCount) {
               resolve(false);
             } else {
-              console.log(results.rows);
+              resolve(true);
+            }
+          } catch (error) {
+            reject("Something went wrong!");
+          }
+        }
+      );
+    });
+  }
+
+  addToWishlist(userId: string, bookId: string): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      pool.query(
+        `INSERT INTO wishlists (user_id, book_id) VALUES ($1, $2) RETURNING *`,
+        [userId, bookId],
+        (err, results) => {
+          try {
+            if (err || !results.rowCount) {
+              resolve(false);
+            } else {
+              resolve(true);
+            }
+          } catch (error) {
+            reject("Something went wrong!");
+          }
+        }
+      );
+    });
+  }
+
+  removeFromWishlist(userId: string, bookId: string): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      pool.query(
+        `DELETE FROM wishlists WHERE user_id = $1 AND book_id = $2 RETURNING *`,
+        [userId, bookId],
+        (err, results) => {
+          try {
+            if (err || !results.rowCount) {
+              resolve(false);
+            } else {
               resolve(true);
             }
           } catch (error) {

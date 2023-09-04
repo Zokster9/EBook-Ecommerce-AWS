@@ -1,7 +1,11 @@
-import { ReactNode, createContext, useContext } from "react";
+import { AxiosError } from "axios";
+import { ReactNode, createContext, useContext, useState } from "react";
+import { toast } from "react-toastify";
+import WishlistBar from "../components/WishlistBar/WishlistBar";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { UserContextModel } from "../model/user-context";
 import { UserDTO } from "../model/user-dto";
+import { removeFromWishlist } from "../services/UserService";
 
 type UserProviderProps = {
   children: ReactNode;
@@ -15,6 +19,7 @@ export const useUser = () => {
 
 export const UserProvider = ({ children }: UserProviderProps) => {
   const [user, setUser] = useLocalStorage<Partial<UserDTO>>("user", {});
+  const [isWishlistOpen, setIsWishlistOpen] = useState<boolean>(false);
 
   const loginUser = (newUser: UserDTO): void => {
     setUser(newUser);
@@ -28,6 +33,23 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     setUser((prevUser) => ({ ...prevUser, ...updatedUser }));
   };
 
+  const openWishlist = () => setIsWishlistOpen(true);
+  const closeWishlist = () => setIsWishlistOpen(false);
+
+  const removeItemFromWishlist = (bookId: number) => {
+    removeFromWishlist(user.id!, bookId)
+      .then(() => {
+        user.wishlistBooks = user.wishlistBooks?.filter(
+          (wishListBook) => wishListBook.bookId !== bookId
+        );
+        updateUser(user);
+        toast.success("Book successfully removed from wishlist");
+      })
+      .catch((err: AxiosError<{ message: string }>) => {
+        toast.error(err.response?.data.message);
+      });
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -35,9 +57,13 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         loginUser,
         logoutUser,
         updateUser,
+        openWishlist,
+        closeWishlist,
+        removeItemFromWishlist,
       }}
     >
       {children}
+      <WishlistBar isOpen={isWishlistOpen} />
     </UserContext.Provider>
   );
 };

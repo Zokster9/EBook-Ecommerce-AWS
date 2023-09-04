@@ -55,7 +55,6 @@ const RegisterPage = () => {
   });
 
   const onSubmit = (values: any, actions: any) => {
-    console.log(values);
     const user: UserCreationDTO = { ...values };
     register(user)
       .then((message) => {

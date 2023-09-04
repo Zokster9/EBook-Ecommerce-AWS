@@ -15,3 +15,11 @@ export const returnBook = (userId: number, rentedBookDTO: RentedBookDTO) => {
     rentedBookDTO
   );
 };
+
+export const addToWishlist = (userId: number, bookId: number) => {
+  return axios.post(`${baseUrl}api/users/${userId}/wishlist/${bookId}`);
+};
+
+export const removeFromWishlist = (userId: number, bookId: number) => {
+  return axios.delete(`${baseUrl}api/users/${userId}/wishlist/${bookId}`);
+};

@@ -1,4 +1,5 @@
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
+import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import HandshakeIcon from "@mui/icons-material/Handshake";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
@@ -13,7 +14,13 @@ import defaultCover from "../../assets/default_book_cover.png";
 import { useShoppingCart } from "../../context/ShoppingCartContext";
 import { useUser } from "../../context/UserContext";
 import { BookDTO } from "../../model/book-dto";
-import { rentBook, returnBook } from "../../services/UserService";
+import { WishlistBookDTO } from "../../model/wishlist-dto";
+import {
+  addToWishlist,
+  removeFromWishlist,
+  rentBook,
+  returnBook,
+} from "../../services/UserService";
 import { convertDateToString } from "../../utils/utils";
 import "./BookCard.css";
 
@@ -31,6 +38,7 @@ const BookCard = ({ book }: BookProps) => {
   const quantity = getItemQuantity(book.id);
   const { user, updateUser } = useUser();
   const [isBookRented, setIsBookRented] = useState<boolean>(false);
+  const [isBookWishlisted, setIsBookWishlisted] = useState<boolean>(false);
 
   useEffect(() => {
     if (user.rentedBooks) {
@@ -38,6 +46,13 @@ const BookCard = ({ book }: BookProps) => {
         user.rentedBooks.some(
           (rentedBook) =>
             rentedBook.bookId === book.id && !rentedBook.isReturned
+        )
+      );
+    }
+    if (user.wishlistBooks) {
+      setIsBookWishlisted(
+        user.wishlistBooks.some(
+          (wishListBook) => wishListBook.bookId === book.id
         )
       );
     }
@@ -71,6 +86,35 @@ const BookCard = ({ book }: BookProps) => {
         returnedBook.isReturned = true;
         updateUser(user);
         toast.success(response.data);
+      })
+      .catch((err: AxiosError<{ message: string }>) => {
+        toast.error(err.response?.data.message);
+      });
+  };
+
+  const onAddToWishlist = (e: MouseEvent) => {
+    e.stopPropagation();
+    addToWishlist(user.id!, book.id)
+      .then((response) => {
+        const wishlistBook: WishlistBookDTO = { bookId: book.id };
+        user.wishlistBooks = [...user.wishlistBooks!, wishlistBook];
+        updateUser(user);
+        toast.success(response.data);
+      })
+      .catch((err: AxiosError<{ message: string }>) => {
+        toast.error(err.response?.data.message);
+      });
+  };
+
+  const onRemoveWishlist = (e: MouseEvent) => {
+    e.stopPropagation();
+    removeFromWishlist(user.id!, book.id)
+      .then(() => {
+        user.wishlistBooks = user.wishlistBooks?.filter(
+          (wishListBook) => wishListBook.bookId !== book.id
+        );
+        updateUser(user);
+        toast.success("Book successfully removed from wishlist");
       })
       .catch((err: AxiosError<{ message: string }>) => {
         toast.error(err.response?.data.message);
@@ -129,12 +173,35 @@ const BookCard = ({ book }: BookProps) => {
         {user.id && (
           <>
             <Container className="d-flex w-100 align-items-center justify-content-around mb-2 gap-2">
-              <Button style={{ height: 60 }} className="w-50" variant="dark">
-                <span className="me-2">
-                  <FavoriteBorderIcon />
-                </span>
-                Add to wishlist
-              </Button>
+              {isBookWishlisted ? (
+                <>
+                  <Button
+                    style={{ height: 60 }}
+                    className="w-50"
+                    variant="dark"
+                    onClick={onRemoveWishlist}
+                  >
+                    <span className="me-2">
+                      <FavoriteIcon />
+                    </span>
+                    Remove from wishlist
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    style={{ height: 60 }}
+                    className="w-50"
+                    variant="dark"
+                    onClick={onAddToWishlist}
+                  >
+                    <span className="me-2">
+                      <FavoriteBorderIcon />
+                    </span>
+                    Add to wishlist
+                  </Button>
+                </>
+              )}
               {isBookRented ? (
                 <>
                   <Button

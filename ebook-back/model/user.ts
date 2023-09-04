@@ -2,6 +2,8 @@ import { OwnedBook } from "./ownedBook";
 import { OwnedBookDB } from "./ownedBook-db";
 import { RentedBook } from "./rentedBook";
 import { RentedBookDB } from "./rentedBook-db";
+import { WishlistBook } from "./wishlist";
+import { WishlistDB } from "./wishlist-db";
 
 export class User {
   id: number;
@@ -14,6 +16,7 @@ export class User {
   role: string;
   rentedBooks: RentedBook[];
   ownedBooks: OwnedBook[];
+  wishlistBooks: WishlistBook[];
 
   constructor(
     id: number,
@@ -26,6 +29,7 @@ export class User {
     role: string,
     rentedBooks: RentedBookDB[],
     ownedBooks: OwnedBookDB[],
+    wishlistBooks: WishlistDB[],
     avatar?: string
   ) {
     this.id = id;
@@ -44,6 +48,9 @@ export class User {
     this.ownedBooks = ownedBooks.map<OwnedBook>((ownedBook) => ({
       bookId: ownedBook.book_id,
       buyDate: ownedBook.buy_date,
+    }));
+    this.wishlistBooks = wishlistBooks.map<WishlistBook>((wishlistBook) => ({
+      bookId: wishlistBook.book_id,
     }));
   }
 

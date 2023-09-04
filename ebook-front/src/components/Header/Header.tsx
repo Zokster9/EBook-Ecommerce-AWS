@@ -10,10 +10,11 @@ import { useShoppingCart } from "../../context/ShoppingCartContext";
 import { useUser } from "../../context/UserContext";
 import { logout } from "../../services/Auth";
 import CartIcon from "../CartIcon/CartIcon";
+import WishlistIcon from "../WishlistIcon/WishlistIcon";
 
 const Header = () => {
   const { openCart, cartQuantity } = useShoppingCart();
-  const { user, logoutUser } = useUser();
+  const { user, logoutUser, openWishlist } = useUser();
 
   const logOut = () => {
     logout()
@@ -82,6 +83,20 @@ const Header = () => {
                   className="rounded-circle"
                 >
                   <CartIcon quantity={cartQuantity} />
+                </Button>
+              )}
+              {user.wishlistBooks!.length > 0 && (
+                <Button
+                  onClick={openWishlist}
+                  style={{
+                    width: "3rem",
+                    height: "3rem",
+                    position: "relative",
+                  }}
+                  variant="outline-primary"
+                  className="rounded-circle"
+                >
+                  <WishlistIcon quantity={user.wishlistBooks!.length} />
                 </Button>
               )}
               <Nav onClick={logOut}>
