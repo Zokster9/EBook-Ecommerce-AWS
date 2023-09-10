@@ -17,16 +17,18 @@ const WishlistBar = ({ isOpen }: WishlistBarProps) => {
   const [wishlistBooks, setWishlistBooks] = useState<BookDTO[]>([]);
 
   useEffect(() => {
-    const wishlistBooks$ = user.wishlistBooks!.map((wishlistBook) =>
-      getBookById(wishlistBook.bookId).then((response) => response.data)
-    );
-    Promise.all(wishlistBooks$)
-      .then((books) => {
-        setWishlistBooks(books);
-      })
-      .catch((err: AxiosError<{ message: string }>) => {
-        toast.error(err.response?.data.message);
-      });
+    if (!!user.id) {
+      const wishlistBooks$ = user.wishlistBooks!.map((wishlistBook) =>
+        getBookById(wishlistBook.bookId).then((response) => response.data)
+      );
+      Promise.all(wishlistBooks$)
+        .then((books) => {
+          setWishlistBooks(books);
+        })
+        .catch((err: AxiosError<{ message: string }>) => {
+          toast.error(err.response?.data.message);
+        });
+    }
   }, [user]);
 
   return (

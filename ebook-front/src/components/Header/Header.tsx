@@ -1,4 +1,5 @@
 import { AxiosError } from "axios";
+import { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
@@ -10,11 +11,15 @@ import { useShoppingCart } from "../../context/ShoppingCartContext";
 import { useUser } from "../../context/UserContext";
 import { logout } from "../../services/Auth";
 import CartIcon from "../CartIcon/CartIcon";
+import CoinIcon from "../CoinIcon/CoinIcon";
+import CoinPurchaseModal from "../CoinPurchaseModal/CoinPurchaseModal";
 import WishlistIcon from "../WishlistIcon/WishlistIcon";
 
 const Header = () => {
   const { openCart, cartQuantity } = useShoppingCart();
   const { user, logoutUser, openWishlist } = useUser();
+  const [showCoinPurchaseModal, setCoinPurchaseModal] =
+    useState<boolean>(false);
 
   const logOut = () => {
     logout()
@@ -28,25 +33,26 @@ const Header = () => {
       });
   };
   return (
-    <Navbar
-      sticky="top"
-      bg="dark"
-      data-bs-theme="dark"
-      className="shadow-sm mb-4"
-    >
-      <Container>
-        <Navbar.Brand to="/home" as={NavLink}>
-          <img
-            src={logo}
-            width="130"
-            height="40"
-            style={{ objectFit: "cover" }}
-            className="d-inline-block align-top"
-            alt="EBook logo"
-          />
-        </Navbar.Brand>
-        <Navbar.Collapse>
-          {/* <Form className="d-flex">
+    <>
+      <Navbar
+        sticky="top"
+        bg="dark"
+        data-bs-theme="dark"
+        className="shadow-sm mb-4"
+      >
+        <Container>
+          <Navbar.Brand to="/home" as={NavLink}>
+            <img
+              src={logo}
+              width="130"
+              height="40"
+              style={{ objectFit: "cover" }}
+              className="d-inline-block align-top"
+              alt="EBook logo"
+            />
+          </Navbar.Brand>
+          <Navbar.Collapse>
+            {/* <Form className="d-flex">
             <Form.Control
               htmlSize={100}
               type="search"
@@ -56,24 +62,23 @@ const Header = () => {
             />
             <Button variant="outline-success">Search</Button>
           </Form> */}
-          {!user.id ? (
-            <>
-              <Nav className="ms-auto">
-                <Nav.Link to="login" as={NavLink}>
-                  Sign in
-                </Nav.Link>
-              </Nav>
-              <Nav>
-                <Nav.Link to="register" as={NavLink}>
-                  Register
-                </Nav.Link>
-              </Nav>
-            </>
-          ) : (
-            <div className="d-flex justify-content-around align-items-center ms-auto gap-2">
-              {cartQuantity > 0 && (
+            {!user.id ? (
+              <>
+                <Nav className="ms-auto">
+                  <Nav.Link to="login" as={NavLink}>
+                    Sign in
+                  </Nav.Link>
+                </Nav>
+                <Nav>
+                  <Nav.Link to="register" as={NavLink}>
+                    Register
+                  </Nav.Link>
+                </Nav>
+              </>
+            ) : (
+              <div className="d-flex justify-content-around align-items-center ms-auto gap-3">
                 <Button
-                  onClick={openCart}
+                  onClick={() => setCoinPurchaseModal(true)}
                   style={{
                     width: "3rem",
                     height: "3rem",
@@ -82,33 +87,51 @@ const Header = () => {
                   variant="outline-primary"
                   className="rounded-circle"
                 >
-                  <CartIcon quantity={cartQuantity} />
+                  <CoinIcon quantity={user.coins!} />
                 </Button>
-              )}
-              {user.wishlistBooks!.length > 0 && (
-                <Button
-                  onClick={openWishlist}
-                  style={{
-                    width: "3rem",
-                    height: "3rem",
-                    position: "relative",
-                  }}
-                  variant="outline-primary"
-                  className="rounded-circle"
-                >
-                  <WishlistIcon quantity={user.wishlistBooks!.length} />
-                </Button>
-              )}
-              <Nav onClick={logOut}>
-                <Nav.Link to="login" as={NavLink}>
-                  Logout
-                </Nav.Link>
-              </Nav>
-            </div>
-          )}
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
+                {cartQuantity > 0 && (
+                  <Button
+                    onClick={openCart}
+                    style={{
+                      width: "3rem",
+                      height: "3rem",
+                      position: "relative",
+                    }}
+                    variant="outline-primary"
+                    className="rounded-circle"
+                  >
+                    <CartIcon quantity={cartQuantity} />
+                  </Button>
+                )}
+                {user.wishlistBooks!.length > 0 && (
+                  <Button
+                    onClick={openWishlist}
+                    style={{
+                      width: "3rem",
+                      height: "3rem",
+                      position: "relative",
+                    }}
+                    variant="outline-primary"
+                    className="rounded-circle"
+                  >
+                    <WishlistIcon quantity={user.wishlistBooks!.length} />
+                  </Button>
+                )}
+                <Nav onClick={logOut}>
+                  <Nav.Link to="login" as={NavLink}>
+                    Logout
+                  </Nav.Link>
+                </Nav>
+              </div>
+            )}
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+      <CoinPurchaseModal
+        show={showCoinPurchaseModal}
+        onCloseModal={() => setCoinPurchaseModal(false)}
+      />
+    </>
   );
 };
 

@@ -164,4 +164,24 @@ SELECT urb.*, uob.ownedbooks, uwb.wishlistbooks, r.role_name FROM user_owned_boo
       );
     });
   }
+
+  updateCoins(coins: number, userId: number): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      pool.query(
+        `UPDATE users SET coins = $1 WHERE user_id = $2`,
+        [coins, userId],
+        (err, results) => {
+          try {
+            if (err || !results.rowCount) {
+              resolve(false);
+            } else {
+              resolve(true);
+            }
+          } catch (error) {
+            reject("Something went wrong!");
+          }
+        }
+      );
+    });
+  }
 }

@@ -3,7 +3,6 @@ import { OwnedBookDB } from "./ownedBook-db";
 import { RentedBook } from "./rentedBook";
 import { RentedBookDB } from "./rentedBook-db";
 import { WishlistBook } from "./wishlist";
-import { WishlistDB } from "./wishlist-db";
 
 export class User {
   id: number;
@@ -29,7 +28,7 @@ export class User {
     role: string,
     rentedBooks: RentedBookDB[],
     ownedBooks: OwnedBookDB[],
-    wishlistBooks: WishlistDB[],
+    wishlistBooks: number[],
     avatar?: string
   ) {
     this.id = id;
@@ -50,7 +49,7 @@ export class User {
       buyDate: ownedBook.buy_date,
     }));
     this.wishlistBooks = wishlistBooks.map<WishlistBook>((wishlistBook) => ({
-      bookId: wishlistBook.book_id,
+      bookId: wishlistBook,
     }));
   }
 

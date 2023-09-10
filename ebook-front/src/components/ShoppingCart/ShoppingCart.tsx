@@ -1,4 +1,6 @@
+import PaymentIcon from "@mui/icons-material/Payment";
 import { useEffect, useState } from "react";
+import { Button } from "react-bootstrap";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Stack from "react-bootstrap/Stack";
 import { useShoppingCart } from "../../context/ShoppingCartContext";
@@ -38,6 +40,9 @@ const ShoppingCart = ({ isOpen }: ShoppingCartProps) => {
           <div className="ms-auto fw-bold fs-5">
             Total {totalPriceFormatted}
           </div>
+          <Button className="w-100">
+            <PaymentIcon /> Go to checkout
+          </Button>
         </Stack>
       </Offcanvas.Body>
     </Offcanvas>

@@ -1,6 +1,5 @@
 import { OwnedBookDB } from "./ownedBook-db";
 import { RentedBookDB } from "./rentedBook-db";
-import { WishlistDB } from "./wishlist-db";
 
 export interface UserDB {
   user_id: number;
@@ -13,6 +12,6 @@ export interface UserDB {
   coins: number;
   rentedbooks: RentedBookDB[];
   ownedbooks: OwnedBookDB[];
-  wishlistbooks: WishlistDB[];
+  wishlistbooks: number[];
   role_name: string;
 }
