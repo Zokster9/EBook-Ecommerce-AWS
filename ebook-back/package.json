@@ -37,7 +37,6 @@
     "@types/passport": "^1.0.12",
     "@types/passport-jwt": "^3.0.9",
     "@types/passport-local": "^1.0.35",
-    "@types/paypal__checkout-server-sdk": "^1.0.5",
     "@types/pg": "^8.10.2",
     "body-parser": "^1.20.2",
     "concurrently": "^8.2.0",
