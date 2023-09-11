@@ -1,3 +1,4 @@
+import { CartItem } from "./cart-item";
 import { OwnedBookDTO } from "./ownedBook-dto";
 import { RentedBookDTO } from "./rentedBook-dto";
 import { WishlistBookDTO } from "./wishlist-dto";
@@ -13,5 +14,6 @@ export interface UserDTO {
   rentedBooks: RentedBookDTO[];
   ownedBooks: OwnedBookDTO[];
   wishlistBooks: WishlistBookDTO[];
+  shoppingCart: CartItem[];
   avatar?: string;
 }

@@ -23,3 +23,27 @@ export const addToWishlist = (userId: number, bookId: number) => {
 export const removeFromWishlist = (userId: number, bookId: number) => {
   return axios.delete(`${baseUrl}api/users/${userId}/wishlist/${bookId}`);
 };
+
+export const addToCart = (userId: number, bookId: number, quantity: number) => {
+  return axios.post(`${baseUrl}api/users/${userId}/add-to-cart`, {
+    bookId,
+    quantity,
+  });
+};
+
+export const decreaseFromCart = (
+  userId: number,
+  bookId: number,
+  quantity: number
+) => {
+  return axios.post(`${baseUrl}api/users/${userId}/decrease-from-cart`, {
+    bookId,
+    quantity,
+  });
+};
+
+export const removeBookFromCart = (userId: number, bookId: number) => {
+  return axios.delete(
+    `${baseUrl}api/users/${userId}/remove-from-cart/${bookId}`
+  );
+};

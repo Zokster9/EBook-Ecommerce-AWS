@@ -2,6 +2,8 @@ import { OwnedBook } from "./ownedBook";
 import { OwnedBookDB } from "./ownedBook-db";
 import { RentedBook } from "./rentedBook";
 import { RentedBookDB } from "./rentedBook-db";
+import { ShoppingCart } from "./shoppingCart";
+import { ShoppingCartDb } from "./shoppingCart-db";
 import { WishlistBook } from "./wishlist";
 
 export class User {
@@ -16,6 +18,7 @@ export class User {
   rentedBooks: RentedBook[];
   ownedBooks: OwnedBook[];
   wishlistBooks: WishlistBook[];
+  shoppingCart: ShoppingCart[];
 
   constructor(
     id: number,
@@ -29,6 +32,7 @@ export class User {
     rentedBooks: RentedBookDB[],
     ownedBooks: OwnedBookDB[],
     wishlistBooks: number[],
+    shoppingCart: ShoppingCartDb[],
     avatar?: string
   ) {
     this.id = id;
@@ -50,6 +54,10 @@ export class User {
     }));
     this.wishlistBooks = wishlistBooks.map<WishlistBook>((wishlistBook) => ({
       bookId: wishlistBook,
+    }));
+    this.shoppingCart = shoppingCart.map<ShoppingCart>((cartItem) => ({
+      bookId: cartItem.book_id,
+      quantity: cartItem.quantity,
     }));
   }
 

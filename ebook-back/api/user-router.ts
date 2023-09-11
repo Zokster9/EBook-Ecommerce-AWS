@@ -101,3 +101,108 @@ userRouter.delete(
       });
   }
 );
+
+userRouter.post(
+  "/:userId/add-to-cart",
+  passport.authenticate("jwt", { session: false }),
+  (
+    req: Request<{ userId: number }, {}, { bookId: number; quantity: number }>,
+    res
+  ) => {
+    const userId = req.params.userId;
+    const bookId = req.body.bookId;
+    const quantity = req.body.quantity;
+    const userRepo = new UserRepo();
+    userRepo
+      .addToCart(userId, bookId, quantity)
+      .then((isSuccessful) => {
+        if (isSuccessful) {
+          return res
+            .status(200)
+            .send("Successfully added a book to the shopping cart");
+        } else {
+          return res
+            .status(500)
+            .send("Book could not be added to a shopping cart");
+        }
+      })
+      .catch((err) => {
+        return res.status(500).send(err);
+      });
+  }
+);
+
+userRouter.post(
+  "/:userId/decrease-from-cart",
+  passport.authenticate("jwt", { session: false }),
+  (
+    req: Request<{ userId: number }, {}, { bookId: number; quantity: number }>,
+    res
+  ) => {
+    const userId = req.params.userId;
+    const bookId = req.body.bookId;
+    const quantity = req.body.quantity;
+    const userRepo = new UserRepo();
+    if (quantity !== 0) {
+      userRepo
+        .decreaseFromCart(userId, bookId, quantity)
+        .then((isSuccessful) => {
+          if (isSuccessful) {
+            return res
+              .status(200)
+              .send("Successfully removed a book item from the shopping cart");
+          } else {
+            return res
+              .status(500)
+              .send("Book item could not be removed from a shopping cart");
+          }
+        })
+        .catch((err) => {
+          return res.status(500).send(err);
+        });
+    } else {
+      userRepo
+        .removeFromCart(userId, bookId)
+        .then((isSuccessful) => {
+          if (isSuccessful) {
+            return res
+              .status(200)
+              .send("Successfully removed a book from the shopping cart");
+          } else {
+            return res
+              .status(500)
+              .send("Book could not be removed from a shopping cart");
+          }
+        })
+        .catch((err) => {
+          return res.status(500).send(err);
+        });
+    }
+  }
+);
+
+userRouter.delete(
+  "/:userId/remove-from-cart/:bookId",
+  passport.authenticate("jwt", { session: false }),
+  (req: Request<{ userId: number; bookId: number }>, res) => {
+    const userId = req.params.userId;
+    const bookId = req.params.bookId;
+    const userRepo = new UserRepo();
+    userRepo
+      .removeFromCart(userId, bookId)
+      .then((isSuccessful) => {
+        if (isSuccessful) {
+          return res
+            .status(200)
+            .send("Successfully removed a book from the shopping cart");
+        } else {
+          return res
+            .status(500)
+            .send("Book could not be removed from a shopping cart");
+        }
+      })
+      .catch((err) => {
+        return res.status(500).send(err);
+      });
+  }
+);
