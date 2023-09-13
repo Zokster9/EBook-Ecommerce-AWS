@@ -25,8 +25,8 @@ const WishlistBar = ({ isOpen }: WishlistBarProps) => {
         .then((books) => {
           setWishlistBooks(books);
         })
-        .catch((err: AxiosError<{ message: string }>) => {
-          toast.error(err.response?.data.message);
+        .catch((err: AxiosError<string>) => {
+          toast.error(err.response?.data);
         });
     }
   }, [user]);

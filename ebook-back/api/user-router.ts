@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import { UserRepo } from "../db/user-model";
 import { RentedBookDTO } from "../model/rentedBook-dto";
+import { User } from "../model/user";
 import passport from "./authentication/passport";
 export const userRouter = express.Router();
 
@@ -204,5 +205,110 @@ userRouter.delete(
       .catch((err) => {
         return res.status(500).send(err);
       });
+  }
+);
+
+userRouter.post(
+  "/:userId/buy",
+  passport.authenticate("jwt", { session: false }),
+  (
+    req: Request<
+      { userId: number },
+      {},
+      { friendEmail: string; totalPrice: number }
+    >,
+    res
+  ) => {
+    const userId = req.params.userId;
+    const friendEmail = req.body.friendEmail;
+    const totalPrice = req.body.totalPrice;
+    const userRepo = new UserRepo();
+    if (!friendEmail) {
+      userRepo
+        .userHasEnoughCoins(userId, totalPrice)
+        .then((isSuccessful) => {
+          if (isSuccessful) {
+            return userRepo.buyFromCart(userId, userId);
+          } else {
+            res.status(400).send("User does not have enough coins");
+            return new Promise((_, reject) => reject());
+          }
+        })
+        .then((isSuccessful) => {
+          if (isSuccessful) {
+            return userRepo.emptyCart(userId);
+          } else {
+            res.status(500).send("Transaction could not be completed");
+            return new Promise((_, reject) => reject());
+          }
+        })
+        .then((isSuccessful) => {
+          if (isSuccessful) {
+            return userRepo.subtractCoins(userId, totalPrice);
+          } else {
+            res.status(500).send("Coins could not be subtracted");
+            return new Promise((_, reject) => reject());
+          }
+        })
+        .then((isSuccessful) => {
+          if (isSuccessful) {
+            return res
+              .status(201)
+              .send("Successfully bought all items from the shopping cart!");
+          } else {
+            return res.status(500).send("Emptying cart failed");
+          }
+        })
+        .catch((err) => {
+          return res.status(500).send(err);
+        });
+    } else {
+      userRepo
+        .userHasEnoughCoins(userId, totalPrice)
+        .then((isSuccessful): Promise<User | null> => {
+          if (isSuccessful) {
+            return userRepo.findByEmail(friendEmail);
+          } else {
+            res.status(400).send("User does not have enough coins");
+            return new Promise((_, reject) => reject(null));
+          }
+        })
+        .then((user) => {
+          if (!!user) {
+            return userRepo.buyFromCart(user.id, userId);
+          } else {
+            res.status(400).send("Friend user does not exist!");
+            return new Promise((_, reject) => reject());
+          }
+        })
+        .then((isSuccessful) => {
+          if (isSuccessful) {
+            return userRepo.emptyCart(userId);
+          } else {
+            res.status(500).send("Transaction could not be completed");
+            return new Promise((_, reject) => reject());
+          }
+        })
+        .then((isSuccessful) => {
+          if (isSuccessful) {
+            return userRepo.subtractCoins(userId, totalPrice);
+          } else {
+            res.status(500).send("Coins could not be subtracted");
+            return new Promise((_, reject) => reject());
+          }
+        })
+        .then((isSuccessful) => {
+          if (isSuccessful) {
+            return res
+              .status(201)
+              .send("Successfully gifted all items from the shopping cart!");
+          } else {
+            return res.status(500).send("Emptying cart failed");
+          }
+        })
+        .catch((err) => {
+          return res.status(500).send(err);
+        });
+    }
   }
 );

@@ -47,3 +47,14 @@ export const removeBookFromCart = (userId: number, bookId: number) => {
     `${baseUrl}api/users/${userId}/remove-from-cart/${bookId}`
   );
 };
+
+export const buyItems = (
+  userId: number,
+  friendEmail: string,
+  totalPrice: number
+) => {
+  return axios.post<string>(`${baseUrl}api/users/${userId}/buy`, {
+    friendEmail,
+    totalPrice,
+  });
+};

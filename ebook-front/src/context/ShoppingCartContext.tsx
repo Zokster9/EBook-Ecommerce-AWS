@@ -75,9 +75,9 @@ export const ShoppingCartProvider = ({
       .then((_) => {
         updateUser({ ...user });
       })
-      .catch((err: AxiosError<{ message: string }>) => {
+      .catch((err: AxiosError<string>) => {
         updateUser({ ...userCopy });
-        toast.error(err.response?.data.message);
+        toast.error(err.response?.data);
       });
   };
   const decreaseCartQuantity = (bookId: number) => {
@@ -105,9 +105,9 @@ export const ShoppingCartProvider = ({
       .then((_) => {
         updateUser({ ...user });
       })
-      .catch((err: AxiosError<{ message: string }>) => {
+      .catch((err: AxiosError<string>) => {
         updateUser({ ...userCopy });
-        toast.error(err.response?.data.message);
+        toast.error(err.response?.data);
       });
   };
   const removeFromCart = (bookId: number) => {
@@ -119,9 +119,9 @@ export const ShoppingCartProvider = ({
       .then((_) => {
         updateUser({ ...user });
       })
-      .catch((err: AxiosError<{ message: string }>) => {
+      .catch((err: AxiosError<string>) => {
         updateUser({ ...userCopy });
-        toast.error(err.response?.data.message);
+        toast.error(err.response?.data);
       });
   };
 

@@ -23,8 +23,8 @@ const CartItem = ({ bookId, quantity }: CartItemProps) => {
       .then((bookResponse) => {
         setBook(bookResponse.data);
       })
-      .catch((err: AxiosError<{ message: string }>) => {
-        toast.error(err.response?.data.message);
+      .catch((err: AxiosError<string>) => {
+        toast.error(err.response?.data);
       });
   }, [bookId]);
 

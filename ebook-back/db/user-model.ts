@@ -256,4 +256,84 @@ DO UPDATE SET quantity = $3;`,
       );
     });
   }
+
+  buyFromCart(ownerId: number, userId: number): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      pool.query(
+        `INSERT INTO owned_books (user_id, book_id, quantity, buy_date) SELECT $1, book_id, quantity, NOW() FROM shopping_carts WHERE user_id = $2;`,
+        [ownerId, userId],
+        (err, results) => {
+          try {
+            if (err || !results.rowCount) {
+              resolve(false);
+            } else {
+              resolve(true);
+            }
+          } catch (error) {
+            reject("Something went wrong!");
+          }
+        }
+      );
+    });
+  }
+
+  emptyCart(userId: number): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      pool.query(
+        `DELETE FROM shopping_carts WHERE user_id = $1;`,
+        [userId],
+        (err, results) => {
+          try {
+            if (err || !results.rowCount) {
+              resolve(false);
+            } else {
+              resolve(true);
+            }
+          } catch (error) {
+            reject("Something went wrong!");
+          }
+        }
+      );
+    });
+  }
+
+  userHasEnoughCoins(userId: number, totalPrice: number): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      pool.query(
+        `SELECT * FROM users WHERE user_id = $1 AND coins > $2;`,
+        [userId, totalPrice],
+        (err, results) => {
+          try {
+            if (err || !results.rowCount) {
+              resolve(false);
+            } else {
+              resolve(true);
+            }
+          } catch (error) {
+            reject("Something went wrong!");
+          }
+        }
+      );
+    });
+  }
+
+  subtractCoins(userId: number, totalPrice: number): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      pool.query(
+        `UPDATE users SET coins = coins - $1 WHERE user_id = $2;`,
+        [totalPrice, userId],
+        (err, results) => {
+          try {
+            if (err || !results.rowCount) {
+              resolve(false);
+            } else {
+              resolve(true);
+            }
+          } catch (error) {
+            reject("Something went wrong!");
+          }
+        }
+      );
+    });
+  }
 }

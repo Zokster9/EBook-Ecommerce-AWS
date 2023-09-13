@@ -62,8 +62,8 @@ const RegisterPage = () => {
         navigate("/login");
         actions.setSubmitting(false);
       })
-      .catch((err: AxiosError<{ message: string }>) => {
-        toast.error(err.response?.data.message);
+      .catch((err: AxiosError<string>) => {
+        toast.error(err.response?.data);
         actions.setSubmitting(false);
       });
   };

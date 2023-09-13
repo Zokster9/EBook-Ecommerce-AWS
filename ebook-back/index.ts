@@ -1,4 +1,3 @@
-import paypal from "@paypal/checkout-server-sdk";
 import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -13,11 +12,6 @@ const PORT = process.env.PORT || 8000;
 dotenv.config();
 
 const app = express();
-
-const clientId = process.env.PAYPAL_CLIENT_ID!;
-const clientSecret = process.env.PAYPAL_SECRET_KEY!;
-const environment = new paypal.core.SandboxEnvironment(clientId, clientSecret);
-export const client = new paypal.core.PayPalHttpClient(environment);
 
 app.use(
   session({

@@ -21,7 +21,7 @@ const CoinIcon = ({ quantity }: CoinIconProps) => {
           transform: "translate(25%, 25%)",
         }}
       >
-        {quantity}
+        {quantity.toFixed(2)}
       </div>
     </>
   );

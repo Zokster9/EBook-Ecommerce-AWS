@@ -26,8 +26,8 @@ const PaypalCheckoutButton = ({ cost }: PaypalCheckoutButtonProps) => {
           coins,
         });
       })
-      .catch((err: AxiosError<{ message: string }>) => {
-        toast.error(err.response?.data.message);
+      .catch((err: AxiosError<string>) => {
+        toast.error(err.response?.data);
       });
   };
   return (
